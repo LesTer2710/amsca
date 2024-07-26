@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Dice Game</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dice {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            margin: 20px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        .rolling {
+            animation: roll 1s infinite;
+        }
+        @keyframes roll {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            25% { transform: rotate(90deg) translate(10px, -10px); }
+            50% { transform: rotate(180deg) translate(20px, 0); }
+            75% { transform: rotate(270deg) translate(10px, 10px); }
+            100% { transform: rotate(360deg) translate(0, 0); }
+        }
+        .bg-orange {
+            background-color: orange;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container text-center mt-5">
+    <h1 class="mb-4">Color Dice Game</h1>
+    <div id="dice-container">
+        <div class="dice bg-primary"></div>
+        <div class="dice bg-success"></div>
+        <div class="dice bg-warning"></div>
+    </div>
+    <div class="mt-4">
+        <input type="text" id="betColor" class="form-control mb-2" placeholder="Enter your bet color (red, blue, yellow, green, white, orange)">
+        <button id="placeBet" class="btn btn-primary">Place Bet</button>
+    </div>
+    <div id="result" class="mt-4"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    const colorMap = {
+        red: 'bg-danger',
+        blue: 'bg-primary',
+        yellow: 'bg-warning',
+        green: 'bg-success',
+        white: 'bg-light',
+        orange: 'bg-orange'
+    };
+
+    function rollDice() {
+        const colors = Object.values(colorMap);
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function updateDice() {
+        $('#dice-container .dice').each(function() {
+            const color = rollDice();
+            $(this).removeClass().addClass('dice ' + color);
+        });
+    }
+
+    $(document).ready(function() {
+        $('#placeBet').click(function() {
+            const betColor = $('#betColor').val().toLowerCase();
+            const betClass = colorMap[betColor];
+
+            if (!betClass) {
+                $('#result').html('<div class="alert alert-danger">Invalid color. Please enter one of the following: red, blue, yellow, green, white, orange.</div>');
+                return;
+            }
+
+            $('#dice-container .dice').addClass('rolling');
+            setTimeout(function() {
+                $('#dice-container .dice').removeClass('rolling');
+                updateDice();
+
+                let winCount = 0;
+                $('#dice-container .dice').each(function() {
+                    if ($(this).hasClass(betClass)) {
+                        winCount++;
+                    }
+                });
+
+                if (winCount > 0) {
+                    $('#result').html(`<div class="alert alert-success">You win! ${winCount} dice matched your color.</div>`);
+                } else {
+                    $('#result').html(`<div class="alert alert-danger">You lose! No dice matched your color.</div>`);
+                }
+            }, 2000);
+        });
+    });
+</script>
+
+</body>
+</html>
